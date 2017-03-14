@@ -16,17 +16,17 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace ServidorTCP
+
+namespace ClienteTCP
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    /// 
     public partial class MainWindow : Window
     {
         IPAddress ip = IPAddress.Parse("127.0.0.1");
-        int porta = 22222;
-        IPEndPoint servidor;
+        int porta = 33333;
+        IPEndPoint cliente;
         Socket socketComunicacao;
         Thread receptor;
         public static ManualResetEvent allDone;
@@ -34,9 +34,9 @@ namespace ServidorTCP
         public MainWindow()
         {
             InitializeComponent();
-            servidor = new IPEndPoint(ip, porta);
+            cliente = new IPEndPoint(ip, porta);
             socketComunicacao = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socketComunicacao.Bind(servidor);
+            socketComunicacao.Bind(cliente);
             socketComunicacao.Listen(100);
         }
 
@@ -44,15 +44,13 @@ namespace ServidorTCP
         {
             receptor = new Thread(Captura);
             receptor.Start();
-
         }
-
 
         public void Captura()
         {
             while (true)
             {
-               // socketComunicacao.BeginAccept(new AsyncCallback(AcceptCallback), socketComunicacao);
+                
 
             }
         }

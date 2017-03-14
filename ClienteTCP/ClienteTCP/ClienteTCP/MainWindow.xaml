@@ -1,11 +1,11 @@
-﻿<Window x:Name="JanelaPrincipal" x:Class="ServidorTCP.MainWindow"
+﻿<Window x:Name="JanelaPrincipal" x:Class="ClienteTCP.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ServidorTCP"
+        xmlns:local="clr-namespace:ClienteTCP"
         mc:Ignorable="d"
-        Title="Servidor TCP" Height="371" Width="573" Loaded="JanelaPrincipal_Loaded">
+        Title="Cliente TCP" Height="371" Width="573" Loaded="JanelaPrincipal_Loaded">
     <Grid>
         <TextBox x:Name="TBLog" Margin="10,10,10,39" TextWrapping="Wrap"/>
         <TextBox x:Name="TBEnvia" Margin="10,0,99,8" TextWrapping="Wrap" Height="23" VerticalAlignment="Bottom"/>
