@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace ServidorTCP
 {
@@ -24,27 +25,32 @@ namespace ServidorTCP
     /// 
     public partial class MainWindow : Window
     {
-        IPAddress ip = IPAddress.Parse("127.0.0.1");
-        int porta = 22222;
-        IPEndPoint servidor;
-        Socket socketComunicacao;
+
+        IPAddress ipAd = IPAddress.Parse("127.0.0.1");
         Thread receptor;
-        public static ManualResetEvent allDone;
+        string alpha = "";
+        public DispatcherTimer TimerJanela;
 
         public MainWindow()
         {
             InitializeComponent();
-            servidor = new IPEndPoint(ip, porta);
-            socketComunicacao = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socketComunicacao.Bind(servidor);
-            socketComunicacao.Listen(100);
+            TimerJanela = new DispatcherTimer();
+            
         }
 
         private void JanelaPrincipal_Loaded(object sender, RoutedEventArgs e)
         {
             receptor = new Thread(Captura);
             receptor.Start();
+            TimerJanela.Tick += new System.EventHandler(AtualizaJanela);
+            TimerJanela.Interval = new System.TimeSpan(0, 0, 0, 5, 0); 
+            TimerJanela.Start();
 
+        }
+        void AtualizaJanela(object sender, EventArgs e)
+        {
+            if(alpha.Length != 0)
+                TBLog.AppendText(alpha + '\n');
         }
 
 
@@ -52,8 +58,23 @@ namespace ServidorTCP
         {
             while (true)
             {
-               // socketComunicacao.BeginAccept(new AsyncCallback(AcceptCallback), socketComunicacao);
 
+                TcpListener myList = new TcpListener(ipAd, 8001);
+                myList.Start();
+
+                Socket s = myList.AcceptSocket();
+                byte[] b = new byte[100];
+                int k = s.Receive(b);
+              
+                var builder = new StringBuilder();
+
+                for (int i = 0; i < k; i++)
+                     builder.Append(Convert.ToChar(b[i]));
+
+                alpha = builder.ToString();
+                    
+                s.Close();
+                myList.Stop();
             }
         }
     }
