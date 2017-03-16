@@ -35,14 +35,15 @@ namespace ClienteTCP
 
         private void JanelaPrincipal_Loaded(object sender, RoutedEventArgs e)
         {
-            tcpclnt = new TcpClient();
-            tcpclnt.Connect("127.0.0.1", 8001);
+            
         }
 
         private void BTEnvia_Click(object sender, RoutedEventArgs e)
         {
-           
-            
+            tcpclnt = new TcpClient();
+            tcpclnt.Connect("127.0.0.1", 8001);
+
+
             String str = TBEnvia.Text;
             Stream stm = tcpclnt.GetStream();
 
@@ -50,14 +51,12 @@ namespace ClienteTCP
             byte[] ba = asen.GetBytes(str);
          
             stm.Write(ba, 0, ba.Length);
-
-           // tcpclnt.Close();
-           
+            tcpclnt.Close();
         }
 
         private void JanelaPrincipal_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            tcpclnt.Close();
+
         }
     }
 
