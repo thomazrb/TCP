@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Threading;
@@ -28,8 +29,12 @@ namespace ServidorTCP
 
         IPAddress ipAd = IPAddress.Parse("127.0.0.1");
         Thread receptor;
+        TcpListener myList;
         string alpha = "";
         public DispatcherTimer TimerJanela;
+
+        List<string> linhas = new List<string>();
+        int linhaAtual = 0;
 
         public MainWindow()
         {
@@ -49,9 +54,13 @@ namespace ServidorTCP
         }
         void AtualizaJanela(object sender, EventArgs e)
         {
-            if(alpha.Length != 0)
+            if (linhaAtual < linhas.Count())
             {
-                TBLog.AppendText(alpha + '\n');
+                for (int i = linhaAtual; i < linhas.Count(); i++)
+                {
+                    TBLog.AppendText(linhas[i] + '\n');
+                    linhaAtual++;
+                }
                 TBLog.ScrollToEnd();
             }
         }
@@ -59,11 +68,9 @@ namespace ServidorTCP
 
         public void Captura()
         {
-
-            TcpListener myList = new TcpListener(ipAd, 8001);
+            myList = new TcpListener(ipAd, 8001);
             Socket s;
             myList.Start();
-
             while (true)
             {
 
@@ -75,12 +82,14 @@ namespace ServidorTCP
                 for (int i = 0; i < k; i++)
                      builder.Append(Convert.ToChar(b[i]));
 
-                alpha = builder.ToString();
+                linhas.Add(builder.ToString());
                 s.Close();
-
             }
             myList.Stop();
+        }
 
+        private void BTEnvia_Click(object sender, RoutedEventArgs e)
+        {
 
         }
     }

@@ -8,7 +8,7 @@
         Title="Cliente TCP" Height="371" Width="573" Loaded="JanelaPrincipal_Loaded" Closing="JanelaPrincipal_Closing">
     <Grid>
         <TextBox x:Name="TBLog" Margin="10,10,10,39" TextWrapping="Wrap"/>
-        <TextBox x:Name="TBEnvia" Margin="10,0,99,8" TextWrapping="Wrap" Height="23" VerticalAlignment="Bottom"/>
+        <TextBox x:Name="TBEnvia" Margin="10,0,99,8" TextWrapping="Wrap" Height="23" VerticalAlignment="Bottom" KeyDown="TBEnvia_KeyDown"/>
         <Button x:Name="BTEnvia" Content="Envia" Margin="0,0,10,8" Height="23" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Click="BTEnvia_Click"/>
 
     </Grid>

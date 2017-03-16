@@ -52,13 +52,20 @@ namespace ClienteTCP
          
             stm.Write(ba, 0, ba.Length);
             tcpclnt.Close();
+            TBEnvia.Text = "";
         }
 
         private void JanelaPrincipal_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
         }
-    }
+
+        private void TBEnvia_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+                BTEnvia_Click(sender, e);
+        }
+}
 
 }
     
