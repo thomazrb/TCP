@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClienteTCP"
         mc:Ignorable="d"
-        Title="Cliente TCP" Height="371" Width="573" Loaded="JanelaPrincipal_Loaded">
+        Title="Cliente TCP" Height="371" Width="573" Loaded="JanelaPrincipal_Loaded" Closing="JanelaPrincipal_Closing">
     <Grid>
         <TextBox x:Name="TBLog" Margin="10,10,10,39" TextWrapping="Wrap"/>
         <TextBox x:Name="TBEnvia" Margin="10,0,99,8" TextWrapping="Wrap" Height="23" VerticalAlignment="Bottom"/>
