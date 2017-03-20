@@ -25,12 +25,12 @@ namespace ClienteTCP
     /// </summary>
     public partial class MainWindow : Window
     {
-        TcpClient tcpclnt;
+        TcpClient tx;
 
         public MainWindow()
         {
             InitializeComponent();
-
+            tx = new TcpClient();
         }
 
         private void JanelaPrincipal_Loaded(object sender, RoutedEventArgs e)
@@ -40,23 +40,21 @@ namespace ClienteTCP
 
         private void BTEnvia_Click(object sender, RoutedEventArgs e)
         {
-            tcpclnt = new TcpClient();
-            tcpclnt.Connect("127.0.0.1", 8001);
 
 
-            String str = TBEnvia.Text;
-            Stream stm = tcpclnt.GetStream();
+            String linha = TBEnvia.Text;
+            Stream fluxoDeDados = tx.GetStream();
 
-            ASCIIEncoding asen = new ASCIIEncoding();
-            byte[] ba = asen.GetBytes(str);
-         
-            stm.Write(ba, 0, ba.Length);
-            tcpclnt.Close();
+            ASCIIEncoding codificacao = new ASCIIEncoding();
+            byte[] dados = codificacao.GetBytes(linha);
+
+            fluxoDeDados.Write(dados, 0, dados.Length);
             TBEnvia.Text = "";
         }
-
+         
         private void JanelaPrincipal_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+
 
         }
 
@@ -65,7 +63,17 @@ namespace ClienteTCP
             if (e.Key == Key.Return)
                 BTEnvia_Click(sender, e);
         }
-}
+
+        private void BTConectaAoServidor_Click(object sender, RoutedEventArgs e)
+        {
+            tx.Connect("127.0.0.1", 8001);
+        }
+
+        private void BTDesconectaDoServidor_Click(object sender, RoutedEventArgs e)
+        {
+            tx.Close();
+        }
+    }
 
 }
     

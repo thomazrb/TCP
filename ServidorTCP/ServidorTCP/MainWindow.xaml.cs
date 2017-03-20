@@ -27,26 +27,24 @@ namespace ServidorTCP
     public partial class MainWindow : Window
     {
 
-        IPAddress ipAd = IPAddress.Parse("127.0.0.1");
+        IPAddress IPServidor = IPAddress.Parse("127.0.0.1");
         Thread receptor;
-        TcpListener myList;
-        string alpha = "";
+        TcpListener rx;
         public DispatcherTimer TimerJanela;
+        Socket s;
 
         List<string> linhas = new List<string>();
         int linhaAtual = 0;
+        
 
         public MainWindow()
         {
             InitializeComponent();
             TimerJanela = new DispatcherTimer();
-            
         }
 
         private void JanelaPrincipal_Loaded(object sender, RoutedEventArgs e)
         {
-            receptor = new Thread(Captura);
-            receptor.Start();
             TimerJanela.Tick += new System.EventHandler(AtualizaJanela);
             TimerJanela.Interval = new System.TimeSpan(0, 0, 0, 0,50); 
             TimerJanela.Start();
@@ -68,13 +66,9 @@ namespace ServidorTCP
 
         public void Captura()
         {
-            myList = new TcpListener(ipAd, 8001);
-            Socket s;
-            myList.Start();
+             s = rx.AcceptSocket();
             while (true)
             {
-
-                s = myList.AcceptSocket();
                 byte[] b = new byte[100];
                 int k = s.Receive(b);   
                 var builder = new StringBuilder();
@@ -83,14 +77,41 @@ namespace ServidorTCP
                      builder.Append(Convert.ToChar(b[i]));
 
                 linhas.Add(builder.ToString());
-                s.Close();
+                
             }
-            myList.Stop();
+            
         }
 
         private void BTEnvia_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void JanelaPrincipal_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+        }
+
+        private void BTIniciaServidor_Click(object sender, RoutedEventArgs e)
+        {
+            BTIniciaServidor.IsEnabled = false;
+            BTEncerraServidor.IsEnabled = true;
+            TBEnvia.IsEnabled = true;
+            BTEnvia.IsEnabled = true;
+            rx = new TcpListener(IPServidor, 8001);
+            rx.Start();
+            receptor = new Thread(Captura);
+            receptor.Start();
+        }
+
+        private void BTEncerraServidor_Click(object sender, RoutedEventArgs e)
+        {
+            BTIniciaServidor.IsEnabled = true;
+            BTEncerraServidor.IsEnabled = false;
+            TBEnvia.IsEnabled = false;
+            BTEnvia.IsEnabled = false;
+            rx.Stop();
+            receptor.Abort();
         }
     }
 }
