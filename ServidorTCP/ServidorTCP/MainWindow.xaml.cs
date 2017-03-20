@@ -66,17 +66,26 @@ namespace ServidorTCP
 
         public void Captura()
         {
-             s = rx.AcceptSocket();
+            s = rx.AcceptSocket();
             while (true)
             {
-                byte[] b = new byte[100];
-                int k = s.Receive(b);   
-                var builder = new StringBuilder();
+                if (!(s.Poll(1, SelectMode.SelectRead) && s.Available == 0))
+                {
+                    byte[] b = new byte[100];
+                    int k = s.Receive(b);
+                    var builder = new StringBuilder();
 
-                for (int i = 0; i < k; i++)
-                     builder.Append(Convert.ToChar(b[i]));
+                    for (int i = 0; i < k; i++)
+                        builder.Append(Convert.ToChar(b[i]));
 
-                linhas.Add(builder.ToString());
+                    linhas.Add(builder.ToString());
+                }
+                else
+                {
+                    rx.Stop();
+                    break;
+                }
+
                 
             }
             
