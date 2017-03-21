@@ -84,16 +84,16 @@ namespace ServidorTCP
                 {
                     rx.Stop();
                     break;
-                }
-
-                
-            }
-            
+                }       
+            }           
         }
 
         private void BTEnvia_Click(object sender, RoutedEventArgs e)
         {
-
+            ASCIIEncoding codificacao = new ASCIIEncoding();
+            String linha = TBEnvia.Text;
+            s.Send(codificacao.GetBytes(linha));
+            TBEnvia.Text = "";
         }
 
         private void JanelaPrincipal_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -121,6 +121,12 @@ namespace ServidorTCP
             BTEnvia.IsEnabled = false;
             rx.Stop();
             receptor.Abort();
+        }
+
+        private void TBEnvia_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+                BTEnvia_Click(sender, e);
         }
     }
 }

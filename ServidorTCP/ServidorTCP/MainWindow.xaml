@@ -8,7 +8,7 @@
         Title="Servidor TCP" Height="371" Width="573" Loaded="JanelaPrincipal_Loaded" Closing="JanelaPrincipal_Closing">
     <Grid>
         <TextBox x:Name="TBLog" Margin="10,80,10,39" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
-        <TextBox x:Name="TBEnvia" Margin="10,0,99,8" TextWrapping="Wrap" Height="23" VerticalAlignment="Bottom" IsEnabled="False"/>
+        <TextBox x:Name="TBEnvia" Margin="10,0,99,8" TextWrapping="Wrap" Height="23" VerticalAlignment="Bottom" IsEnabled="False" KeyDown="TBEnvia_KeyDown"/>
         <Button x:Name="BTEnvia" Content="Envia" Margin="0,0,10,8" Height="23" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Click="BTEnvia_Click" IsEnabled="False"/>
         <Button x:Name="BTIniciaServidor" Content="Inicia Servidor" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="135" Click="BTIniciaServidor_Click"/>
         <Button x:Name="BTEncerraServidor" Content="Encerra Servidor" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="135" Click="BTEncerraServidor_Click" IsEnabled="False"/>
