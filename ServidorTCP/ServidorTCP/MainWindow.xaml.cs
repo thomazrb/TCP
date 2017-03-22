@@ -31,7 +31,8 @@ namespace ServidorTCP
         Thread receptor;
         TcpListener rx;
         public DispatcherTimer TimerJanela;
-        Socket s;
+        Socket s = null;
+
 
         List<string> linhas = new List<string>();
         int linhaAtual = 0;
@@ -66,26 +67,49 @@ namespace ServidorTCP
 
         public void Captura()
         {
-            s = rx.AcceptSocket();
-            while (true)
+            try
             {
-                if (!(s.Poll(1, SelectMode.SelectRead) && s.Available == 0))
+                s = rx.AcceptSocket();
+
+                if (s.Connected)
                 {
-                    byte[] b = new byte[100];
-                    int k = s.Receive(b);
-                    var builder = new StringBuilder();
-
-                    for (int i = 0; i < k; i++)
-                        builder.Append(Convert.ToChar(b[i]));
-
-                    linhas.Add(builder.ToString());
+                    linhas.Add("Cliente Conectado ao Servidor!");
                 }
-                else
+
+                while (true)
                 {
-                    rx.Stop();
-                    break;
-                }       
-            }           
+                    if (!(s.Poll(1, SelectMode.SelectRead) && s.Available == 0))
+                    {
+                        byte[] b = new byte[100];
+                        int k = s.Receive(b);
+                        var builder = new StringBuilder();
+
+                        for (int i = 0; i < k; i++)
+                            builder.Append(Convert.ToChar(b[i]));
+
+                        if(builder.ToString() == "")
+                        {
+                            linhas.Add("Cliente desconectado do Servidor!");
+                            rx.Stop();
+                            break;
+                        }
+                        else
+                            linhas.Add(builder.ToString());
+                    }
+                    else
+                    {
+                        rx.Stop();
+                        break;
+                    }
+                    Thread.Sleep(1000);
+                }
+
+
+            }
+            catch(Exception exeptionCaptura)
+            {
+               //linhas.Add("Falha na captura: " + exeptionCaptura.StackTrace);
+            }        
         }
 
         private void BTEnvia_Click(object sender, RoutedEventArgs e)
@@ -103,24 +127,52 @@ namespace ServidorTCP
 
         private void BTIniciaServidor_Click(object sender, RoutedEventArgs e)
         {
-            BTIniciaServidor.IsEnabled = false;
-            BTEncerraServidor.IsEnabled = true;
-            TBEnvia.IsEnabled = true;
-            BTEnvia.IsEnabled = true;
-            rx = new TcpListener(IPServidor, 8001);
-            rx.Start();
-            receptor = new Thread(Captura);
-            receptor.Start();
+
+            try
+            {
+                BTIniciaServidor.IsEnabled = false;
+                BTEncerraServidor.IsEnabled = true;
+                TBEnvia.IsEnabled = true;
+                BTEnvia.IsEnabled = true;
+                rx = null;
+                rx = new TcpListener(IPServidor, 8001);
+                rx.Start();
+                receptor = new Thread(Captura);
+                receptor.Start();
+                linhas.Add("Servidor Iniciado!");
+            }
+            catch (Exception exeptionServidor)
+            {
+                linhas.Add("Falha na criação do servidor: " + exeptionServidor.StackTrace);
+
+            }
+
         }
 
         private void BTEncerraServidor_Click(object sender, RoutedEventArgs e)
         {
-            BTIniciaServidor.IsEnabled = true;
-            BTEncerraServidor.IsEnabled = false;
-            TBEnvia.IsEnabled = false;
-            BTEnvia.IsEnabled = false;
-            rx.Stop();
-            receptor.Abort();
+
+            try
+            {
+               
+                if (s.Connected)
+                {
+                    ASCIIEncoding codificacao = new ASCIIEncoding();
+                    String linha = "a0";
+                    s.Send(codificacao.GetBytes(linha));
+                }
+                rx.Stop();
+                receptor.Abort();
+                BTIniciaServidor.IsEnabled = true;
+                BTEncerraServidor.IsEnabled = false;
+                TBEnvia.IsEnabled = false;
+                BTEnvia.IsEnabled = false;
+                linhas.Add("Servidor Encerrado!");
+            }
+            catch(Exception exceptionEncerraServidor)
+            {
+                //linhas.Add("Falha ao desligar o servidor: " + exceptionEncerraServidor.StackTrace);
+            }
         }
 
         private void TBEnvia_KeyDown(object sender, KeyEventArgs e)

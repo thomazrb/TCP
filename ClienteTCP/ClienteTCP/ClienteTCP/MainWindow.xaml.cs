@@ -17,7 +17,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Threading;
-
+using System.Net.NetworkInformation;
 namespace ClienteTCP
 {
     /// <summary>
@@ -26,9 +26,10 @@ namespace ClienteTCP
     public partial class MainWindow : Window
     {
         TcpClient tx = null;
-        Thread receptor;
+        Thread receptor = null;
+      
         public DispatcherTimer TimerJanela;
-
+        private bool ServidorON = false;  
         List<string> linhas = new List<string>();
         int linhaAtual = 0;
 
@@ -44,10 +45,33 @@ namespace ClienteTCP
             TimerJanela.Tick += new System.EventHandler(AtualizaJanela);
             TimerJanela.Interval = new System.TimeSpan(0, 0, 0, 0, 50);
             TimerJanela.Start();
+            
         }
-
+       
+        
         void AtualizaJanela(object sender, EventArgs e)
         {
+            if(ServidorON == true)
+            {
+                BTConectaAoServidor.IsEnabled = false;
+                BTDesconectaDoServidor.IsEnabled = true;
+                TBEnvia.IsEnabled = true;
+                BTEnvia.IsEnabled = true;
+
+            }
+            else
+            {
+                BTConectaAoServidor.IsEnabled = true;
+                BTDesconectaDoServidor.IsEnabled = false;
+                TBEnvia.IsEnabled = false;
+                BTEnvia.IsEnabled = false;
+                if (tx != null && receptor != null)
+                {
+                    tx.Close();
+                    receptor.Interrupt();
+                }
+            }
+
             if (linhaAtual < linhas.Count())
             {
                 for (int i = linhaAtual; i < linhas.Count(); i++)
@@ -58,6 +82,7 @@ namespace ClienteTCP
                 TBLog.ScrollToEnd();
             }
         }
+
         private void BTEnvia_Click(object sender, RoutedEventArgs e)
         {
 
@@ -85,24 +110,37 @@ namespace ClienteTCP
 
         private void BTConectaAoServidor_Click(object sender, RoutedEventArgs e)
         {
-            BTConectaAoServidor.IsEnabled = false;
-            BTDesconectaDoServidor.IsEnabled = true;
-            TBEnvia.IsEnabled = true;
-            BTEnvia.IsEnabled = true;
-            tx = new TcpClient();
-            tx.Connect("127.0.0.1", 8001);
-            receptor = new Thread(Captura);
-            receptor.Start();
+
+            try
+            {
+                tx = null;
+                tx = new TcpClient();
+                string IPServidor = TBIPServidor.Text;
+                tx.Connect(IPServidor, 8001);
+                ServidorON = true;
+                receptor = new Thread(Captura);
+                receptor.Start();
+                
+               
+            }
+            catch(Exception exceptionServidoroff)
+            {
+                linhas.Add("Servidor off!");
+            }
+
         }
 
         private void BTDesconectaDoServidor_Click(object sender, RoutedEventArgs e)
         {
+           
+            ServidorON = false;
             BTConectaAoServidor.IsEnabled = true;
             BTDesconectaDoServidor.IsEnabled = false;
             TBEnvia.IsEnabled = false;
             BTEnvia.IsEnabled = false;
             tx.Close();
             receptor.Abort();
+
         }
 
         public void Captura()
@@ -117,11 +155,25 @@ namespace ClienteTCP
                 for (int i = 0; i < k; i++)
                     builder.Append(Convert.ToChar(b[i]));
 
-                linhas.Add(builder.ToString());
-                
+                if (builder.ToString() == "a0")
+                {
+                    linhas.Add("Servidor desligado! Desconectando do servidor...");
+                    ServidorON = false;
+                    break;
+                }
+                else
+                    linhas.Add(builder.ToString());
+
+                Thread.Sleep(1000);
             }
+          
         }
+
+      
     }
 
+
 }
+
+
     
