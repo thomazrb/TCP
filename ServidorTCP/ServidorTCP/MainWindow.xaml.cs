@@ -143,7 +143,7 @@ namespace ServidorTCP
             }
             catch (Exception exeptionServidor)
             {
-                linhas.Add("Falha na criação do servidor: " + exeptionServidor.StackTrace);
+                linhas.Add("Falha na criação do Servidor: " + exeptionServidor.StackTrace);
 
             }
 

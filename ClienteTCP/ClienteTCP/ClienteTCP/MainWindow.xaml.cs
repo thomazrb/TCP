@@ -120,8 +120,8 @@ namespace ClienteTCP
                 ServidorON = true;
                 receptor = new Thread(Captura);
                 receptor.Start();
-                
-               
+                linhas.Add("Cliente Conectado ao Servidor!");
+
             }
             catch(Exception exceptionServidoroff)
             {
@@ -132,7 +132,7 @@ namespace ClienteTCP
 
         private void BTDesconectaDoServidor_Click(object sender, RoutedEventArgs e)
         {
-           
+            linhas.Add("Cliente desconectado do Servidor!");
             ServidorON = false;
             BTConectaAoServidor.IsEnabled = true;
             BTDesconectaDoServidor.IsEnabled = false;
