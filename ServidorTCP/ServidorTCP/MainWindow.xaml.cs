@@ -28,11 +28,11 @@ namespace ServidorTCP
     {
 
         IPAddress IPServidor = IPAddress.Parse("127.0.0.1");
-        Thread receptor;
-        TcpListener rx;
+        Thread receptor = null;
+        TcpListener rx = null;
         public DispatcherTimer TimerJanela;
         Socket s = null;
-
+        private bool clienteON = false;
 
         List<string> linhas = new List<string>();
         int linhaAtual = 0;
@@ -73,7 +73,10 @@ namespace ServidorTCP
 
                 if (s.Connected)
                 {
+
                     linhas.Add("Cliente Conectado ao Servidor!");
+                    clienteON = true;
+
                 }
 
                 while (true)
@@ -90,6 +93,7 @@ namespace ServidorTCP
                         if(builder.ToString() == "")
                         {
                             linhas.Add("Cliente desconectado do Servidor!");
+                            clienteON = false;
                             rx.Stop();
                             break;
                         }
@@ -101,7 +105,7 @@ namespace ServidorTCP
                         rx.Stop();
                         break;
                     }
-                    Thread.Sleep(1000);
+                  
                 }
 
 
@@ -116,12 +120,25 @@ namespace ServidorTCP
         {
             ASCIIEncoding codificacao = new ASCIIEncoding();
             String linha = TBEnvia.Text;
-            s.Send(codificacao.GetBytes(linha));
-            TBEnvia.Text = "";
+            if (s.Connected)
+            {
+                s.Send(codificacao.GetBytes(linha));
+                TBEnvia.Text = "";
+            }
         }
 
         private void JanelaPrincipal_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (clienteON)
+            {
+                ASCIIEncoding codificacao = new ASCIIEncoding();
+                String linha = "a0";
+                s.Send(codificacao.GetBytes(linha));
+            }
+            if (rx != null)
+                rx.Stop();
+            else if (receptor != null)
+                receptor.Abort();
 
         }
 

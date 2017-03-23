@@ -99,7 +99,12 @@ namespace ClienteTCP
         private void JanelaPrincipal_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
-
+            ServidorON = false;
+            Thread.Sleep(1000);
+            if (tx != null)
+                tx.Close();
+            else if(receptor != null)
+                receptor.Abort();
         }
 
         private void TBEnvia_KeyDown(object sender, KeyEventArgs e)
@@ -145,15 +150,21 @@ namespace ClienteTCP
 
         public void Captura()
         {
-            while (true)
+            while (ServidorON)
             {
-                Stream stream = tx.GetStream();
+                NetworkStream stream = tx.GetStream();
                 var builder = new StringBuilder();
                 byte[] b = new byte[100];
+
+                //stream.ReadTimeout = 100;
                 int k = stream.Read(b, 0, 100);
 
                 for (int i = 0; i < k; i++)
+                {
                     builder.Append(Convert.ToChar(b[i]));
+
+
+                }
 
                 if (builder.ToString() == "a0")
                 {
@@ -164,7 +175,7 @@ namespace ClienteTCP
                 else
                     linhas.Add(builder.ToString());
 
-                Thread.Sleep(1000);
+         
             }
           
         }
