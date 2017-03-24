@@ -83,12 +83,12 @@ namespace ServidorTCP
                 {
                     if (!(s.Poll(1, SelectMode.SelectRead) && s.Available == 0))
                     {
-                        byte[] b = new byte[100];
-                        int k = s.Receive(b);
+                        byte[] data = new byte[100];
+                        int bytes_received = s.Receive(data);
                         var builder = new StringBuilder();
 
-                        for (int i = 0; i < k; i++)
-                            builder.Append(Convert.ToChar(b[i]));
+                        for (int i = 0; i < bytes_received; i++)
+                            builder.Append(Convert.ToChar(data[i]));
 
                         if(builder.ToString() == "")
                         {
@@ -104,11 +104,8 @@ namespace ServidorTCP
                     {
                         rx.Stop();
                         break;
-                    }
-                  
+                    }              
                 }
-
-
             }
             catch(Exception exeptionCaptura)
             {

@@ -25,13 +25,12 @@ namespace ClienteTCP
     /// </summary>
     public partial class MainWindow : Window
     {
-        TcpClient tx = null;
-        Thread receptor = null;
-      
-        public DispatcherTimer TimerJanela;
+        private TcpClient tx = null;
+        private Thread receptor = null; 
+        private DispatcherTimer TimerJanela;
         private bool ServidorON = false;  
-        List<string> linhas = new List<string>();
-        int linhaAtual = 0;
+        private List<string> linhas = new List<string>();
+        private int linhaAtual = 0;
 
         public MainWindow()
         {
@@ -44,8 +43,7 @@ namespace ClienteTCP
         {
             TimerJanela.Tick += new System.EventHandler(AtualizaJanela);
             TimerJanela.Interval = new System.TimeSpan(0, 0, 0, 0, 50);
-            TimerJanela.Start();
-            
+            TimerJanela.Start();         
         }
        
         
@@ -57,7 +55,6 @@ namespace ClienteTCP
                 BTDesconectaDoServidor.IsEnabled = true;
                 TBEnvia.IsEnabled = true;
                 BTEnvia.IsEnabled = true;
-
             }
             else
             {
@@ -65,6 +62,7 @@ namespace ClienteTCP
                 BTDesconectaDoServidor.IsEnabled = false;
                 TBEnvia.IsEnabled = false;
                 BTEnvia.IsEnabled = false;
+
                 if (tx != null && receptor != null)
                 {
                     tx.Close();
@@ -85,7 +83,6 @@ namespace ClienteTCP
 
         private void BTEnvia_Click(object sender, RoutedEventArgs e)
         {
-
             String linha = TBEnvia.Text;
             Stream fluxoDeDados = tx.GetStream();
 
@@ -98,9 +95,7 @@ namespace ClienteTCP
          
         private void JanelaPrincipal_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-
-            ServidorON = false;
-            Thread.Sleep(1000);
+            ServidorON = false;         
             if (tx != null)
                 tx.Close();
             else if(receptor != null)
@@ -115,7 +110,6 @@ namespace ClienteTCP
 
         private void BTConectaAoServidor_Click(object sender, RoutedEventArgs e)
         {
-
             try
             {
                 tx = null;
@@ -145,45 +139,48 @@ namespace ClienteTCP
             BTEnvia.IsEnabled = false;
             tx.Close();
             receptor.Abort();
-
         }
 
         public void Captura()
         {
             while (ServidorON)
             {
-                NetworkStream stream = tx.GetStream();
+                Stream stream = tx.GetStream();
+                stream.ReadTimeout = 100;
                 var builder = new StringBuilder();
-                byte[] b = new byte[100];
+                byte[] data = new byte[100];            
+                int bytes_received = 0;
+                int Connected = 1;
 
-                //stream.ReadTimeout = 100;
-                int k = stream.Read(b, 0, 100);
-
-                for (int i = 0; i < k; i++)
+                while (Connected == 1)
                 {
-                    builder.Append(Convert.ToChar(b[i]));
+                    try
+                    {
+                        bytes_received = stream.Read(data, 0, data.Length);
+                    }
+                    catch (IOException ex)
+                    {
+                        Connected = 0;
+                    }
 
+                    if ((bytes_received > 0) && (Connected == 1))
+                    {
+                        for (int i = 0; i < bytes_received; i++)
+                            builder.Append(Convert.ToChar(data[i]));
 
-                }
-
-                if (builder.ToString() == "a0")
-                {
-                    linhas.Add("Servidor desligado! Desconectando do servidor...");
-                    ServidorON = false;
-                    break;
-                }
-                else
-                    linhas.Add(builder.ToString());
-
-         
-            }
-          
+                        if (builder.ToString() == "a0")
+                        {
+                            linhas.Add("Servidor desligado! Desconectando do servidor...");
+                            ServidorON = false;
+                            break;
+                        }
+                        else
+                            linhas.Add(builder.ToString());
+                    }
+                }           
+            } 
         }
-
-      
     }
-
-
 }
 
 
